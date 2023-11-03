@@ -42,33 +42,45 @@ def fetch_asset_urls(response):
 
     return  image_urls, assets, other_urls
 
-bose_url = st.text_input("Input Bose Professional URL", None)
-
-if bose_url:
-
-    # Send an HTTP GET request to the URL
-    response = requests.get(bose_url)
+def scrape_data(page_url):
+    response = requests.get(page_url)
 
     # Check if the request was successful
     if response.status_code == 200:
+        img_urls, asset_urls, other_urls = fetch_asset_urls(response)
 
-        img_urls , asset_urls, other_urls = fetch_asset_urls(response)
+    df_bose_images = pd.DataFrame({'Bynder URLs': img_urls})
+    df_assets = pd.DataFrame({'Asset URLS': asset_urls})
+    df_other_images = pd.DataFrame({'Other image URLS': other_urls})
+
+    df_combined = pd.concat([df_bose_images, df_assets, df_other_images], axis=1)
+
+    return df_combined
 
 
-        # Create separate DataFrames for image_urls and assets
-        df_bose_images = pd.DataFrame({'Bynder URLs': img_urls})
-        df_assets = pd.DataFrame({'Asset URLS': asset_urls})
-        df_other_images= pd.DataFrame({'Other image URLS': other_urls})
+bose_url = st.text_input("Input Bose Professional URL", None)
+uploaded_file = st.file_uploader("Choose a CSV file")
+if uploaded_file:
+   df_page_urls = pd.read_csv(uploaded_file)
+   output_data = []
 
-        # Concatenate DataFrames along the columns (axis=1)
-        df_combined = pd.concat([df_bose_images, df_assets,df_other_images ], axis=1)
-
-        # Print the first few rows of the combined DataFrame
+   for index, row in df_page_urls.iterrows():
+        print(row['URL'])
+        df_combined = scrape_data(row['URL'])
+        output_data.append({'URL': row['URL'], 'ScrapedData': df_combined})
+        st.header(row['URL'])
         df_combined
 
 
-    else:
-        print('Failed to retrieve the webpage.')
+
+
+if bose_url:
+
+    df_combined =scrape_data(page_url)
+
+    df_combined
+
+
 
 
 
