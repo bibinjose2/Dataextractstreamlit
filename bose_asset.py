@@ -21,16 +21,17 @@ def fetch_asset_urls(response):
     # Extract image URLs
     image_urls = []
     other_urls =[]
+    related_pages = []
     for img in img_tags:
         if 'data-srcset' in img.attrs:
-            image_urls.append(img['data-srcset'].split('jcr:content')[0].replace("//assets","https://assets"))
+            image_urls.append(img['data-srcset'].split('320w')[0].replace("//assets","https://assets"))
+
         elif 'src' in img.attrs:
             if "assets.bose.com" in img['src']:
 
                image_urls.append(img['src'].replace("//assets","https://assets"))
             else:
                 other_urls.append(img['src'])
-
 
     # Find all elements with the specified class
     elements = soup.find_all(class_="productDocuments")
@@ -41,20 +42,30 @@ def fetch_asset_urls(response):
         a_tags = element.find_all('a')
         assets += [asset.get('href').replace("//assets","https://assets") for asset in a_tags if asset.get('href')]
 
-    return  image_urls, assets, other_urls
+    elements = soup.find_all(class_="productList")
+
+    # Extract href attributes
+    related_pages = []
+    for element in elements:
+        print(element)
+        a_tags = element.find_all('a')
+        related_pages += ["https://www.boseprofessional.com"+asset.get('href') for asset in a_tags if asset.get('href') and "//assets" not in asset.get('href')]
+        related_pages = list(set(related_pages))
+    return  image_urls, assets, other_urls, related_pages
 
 def scrape_data(page_url):
     response = requests.get(page_url)
 
     # Check if the request was successful
     if response.status_code == 200:
-        img_urls, asset_urls, other_urls = fetch_asset_urls(response)
+        img_urls, asset_urls, other_urls, related_pages= fetch_asset_urls(response)
 
-    df_bose_images = pd.DataFrame({'Bynder URLs': img_urls})
-    df_assets = pd.DataFrame({'Asset URLS': asset_urls})
+    df_bose_images = pd.DataFrame({'asset.bose image URLs': img_urls})
+    df_assets = pd.DataFrame({'asset.bose asset URLS': asset_urls})
     df_other_images = pd.DataFrame({'Other image URLS': other_urls})
+    df_related_pages = pd.DataFrame({'Related pages': related_pages})
 
-    df_combined = pd.concat([df_bose_images, df_assets, df_other_images], axis=1)
+    df_combined = pd.concat([df_bose_images, df_assets, df_other_images, df_related_pages], axis=1)
 
     return df_combined
 
@@ -72,11 +83,9 @@ if uploaded_file:
         df_combined
 
 
-
-
 if bose_url:
 
-    df_combined =scrape_data(page_url)
+    df_combined =scrape_data(bose_url)
 
     df_combined
 
