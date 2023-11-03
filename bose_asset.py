@@ -23,10 +23,11 @@ def fetch_asset_urls(response):
     other_urls =[]
     for img in img_tags:
         if 'data-srcset' in img.attrs:
-            image_urls.append(img['data-srcset'].split('jcr:content')[0])
+            image_urls.append(img['data-srcset'].split('jcr:content')[0].replace("//assets","https://assets"))
         elif 'src' in img.attrs:
             if "assets.bose.com" in img['src']:
-               image_urls.append(img['src'])
+
+               image_urls.append(img['src'].replace("//assets","https://assets"))
             else:
                 other_urls.append(img['src'])
 
@@ -38,7 +39,7 @@ def fetch_asset_urls(response):
     assets = []
     for element in elements:
         a_tags = element.find_all('a')
-        assets += [asset.get('href') for asset in a_tags if asset.get('href')]
+        assets += [asset.get('href').replace("//assets","https://assets") for asset in a_tags if asset.get('href')]
 
     return  image_urls, assets, other_urls
 
@@ -65,7 +66,6 @@ if uploaded_file:
    output_data = []
 
    for index, row in df_page_urls.iterrows():
-        print(row['URL'])
         df_combined = scrape_data(row['URL'])
         output_data.append({'URL': row['URL'], 'ScrapedData': df_combined})
         st.header(row['URL'])
