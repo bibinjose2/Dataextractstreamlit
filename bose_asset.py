@@ -18,12 +18,16 @@ def fetch_asset_urls(response):
     # Find all image tags (img) on the page
     main = soup.find_all('main')
     img_tags = main[0].find_all('img')
+    bg_image = main[0].find_all(class_='bose-story-block__backgroundContainer')
+    img_tags = bg_image + img_tags
 
     # Extract image URLs
     image_urls = []
     other_urls =[]
     related_pages = []
     for img in img_tags:
+        if 'data-bgset' in img.attrs:
+            image_urls.append(img['data-bgset'].split('320w')[0].replace("//assets","https://assets"))
         if 'data-srcset' in img.attrs:
             image_urls.append(img['data-srcset'].split('320w')[0].replace("//assets","https://assets"))
 
@@ -35,7 +39,8 @@ def fetch_asset_urls(response):
                 other_urls.append(img['src'].replace("//static","https://static"))
 
     # Find all elements with the specified class
-    elements = soup.find_all(class_="productDocuments")
+    # elements = soup.find_all(class_="productDocuments")
+    elements = soup.find_all('div', attrs={'lpos': "Downloads region area"})
 
     # Extract href attributes
     assets = []
