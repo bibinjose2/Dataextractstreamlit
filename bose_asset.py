@@ -16,7 +16,8 @@ def fetch_asset_urls(response):
     soup = BeautifulSoup(response.text, 'html.parser')
 
     # Find all image tags (img) on the page
-    img_tags = soup.find_all('img')
+    main = soup.find_all('main')
+    img_tags = main[0].find_all('img')
 
     # Extract image URLs
     image_urls = []
