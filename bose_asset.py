@@ -43,7 +43,10 @@ def fetch_asset_urls(response):
             image_urls.append(img['data-srcset'].split('320w')[0].replace("//assets","https://assets"))
         elif 'src' in img.attrs:
             if "assets.bose.com" in img['src']:
-               image_urls.append(img['src'].replace("//assets","https://assets"))
+                if '160w' in img['data-bgset']:
+                    image_urls.append(img['src'].split('160w')[0].replace("//assets","https://assets"))
+                else:
+                    image_urls.append(img['src'].split('320w')[0].replace("//assets","https://assets"))
             else:
                 other_urls.append(img['src'].replace("//static","https://static"))
                 other = True
