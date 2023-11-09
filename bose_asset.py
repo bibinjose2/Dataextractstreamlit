@@ -10,6 +10,7 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+import time
 
 def fetch_asset_urls(response):
     # Parse the HTML content of the page
@@ -90,18 +91,21 @@ def scrape_data(page_url):
     if response.status_code == 200:
         img_urls, asset_urls, other_urls, other_assets, related_pages, related_labels, asset_label, other_asset_label= fetch_asset_urls(response)
 
-    df_bose_images = pd.DataFrame({'Bynder Image URLs': img_urls})
-    df_assets = pd.DataFrame({'Bynder Asset URLS': asset_urls})
-    df_assets_label = pd.DataFrame({'Bynder Asset Title': asset_label})
-    df_other_images = pd.DataFrame({'Other image URLS': other_urls})
-    df_other_assets = pd.DataFrame({'Other asset URLS': other_assets})
-    df_other_assets_label = pd.DataFrame({'Other Asset Title': other_asset_label})
-    df_related_pages = pd.DataFrame({'Related pages': related_pages})
-    related_labels = pd.DataFrame({'Related labels': related_labels})
+        df_bose_images = pd.DataFrame({'Bynder Image URLs': img_urls})
+        df_assets = pd.DataFrame({'Bynder Asset URLS': asset_urls})
+        df_assets_label = pd.DataFrame({'Bynder Asset Title': asset_label})
+        df_other_images = pd.DataFrame({'Other image URLS': other_urls})
+        df_other_assets = pd.DataFrame({'Other asset URLS': other_assets})
+        df_other_assets_label = pd.DataFrame({'Other Asset Title': other_asset_label})
+        df_related_pages = pd.DataFrame({'Related pages': related_pages})
+        related_labels = pd.DataFrame({'Related labels': related_labels})
 
-    df_combined = pd.concat([df_bose_images, df_assets, df_assets_label, df_other_images, df_other_assets, df_other_assets_label, df_related_pages, related_labels], axis=1)
+        df_combined = pd.concat([df_bose_images, df_assets, df_assets_label, df_other_images, df_other_assets, df_other_assets_label, df_related_pages, related_labels], axis=1)
 
-    return df_combined
+        return df_combined
+
+    else:
+        return response.status_code
 
 
 bose_url = st.text_input("Input Bose Professional URL", None)
@@ -110,15 +114,15 @@ if uploaded_file:
    df_page_urls = pd.read_csv(uploaded_file)
    output_data = []
 
-   for index, row in df_page_urls.iterrows():
-        df_combined = scrape_data(row['URL'])
-        output_data.append({'URL': row['URL'], 'ScrapedData': df_combined})
+   for index, row in df_page_urls.iterrows(): 
+        df_combined = scrape_data(row['URL'].strip())
+        # output_data.append({'URL': row['URL'], 'ScrapedData': df_combined})
         st.header(row['URL'])
         df_combined
 
 
 if bose_url:
 
-    df_combined =scrape_data(bose_url)
+    df_combined =scrape_data(bose_url.strip())
 
     df_combined
