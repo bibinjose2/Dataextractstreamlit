@@ -45,6 +45,7 @@ def fetch_asset_urls(response):
     # Find all elements with the specified class
     # elements = soup.find_all(class_="productDocuments")
     elements = soup.find_all('div', attrs={'lpos': "Downloads region area"})
+    elements = soup.find_all('div', class_='proCallToAction') + elements
 
     # Extract href attributes
     assets = []
