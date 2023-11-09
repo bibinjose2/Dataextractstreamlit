@@ -93,12 +93,12 @@ def fetch_asset_urls(response):
                 if "assets.bose.com" in asset.get('href'):
                     assets.append(asset.get('href').replace("//assets","https://assets"))
                     label = asset.find_previous(class_='bose-list__title')
-                    asset_label.append(label.text if label and element not in elements else None)
+                    asset_label.append(label.text if label and element not in tech_elements else None)
                     asset_text.append(asset.text)
                 else:
                     other_assets.append(asset.get('href'))
                     label = asset.find_previous(class_='bose-list__title')
-                    other_asset_label.append(label.text if label and element not in elements else None)
+                    other_asset_label.append(label.text if label and element not in tech_elements else None)
                     other_asset_text.append(asset.text)
 
     elements = soup.find_all(class_="productList")
