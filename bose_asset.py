@@ -76,8 +76,8 @@ def fetch_asset_urls(response):
     # elements = soup.find_all(class_="productDocuments")
     elements = soup.find_all('div', attrs={'lpos': "Downloads region area"})
     elements = soup.find_all('div', class_='proCallToAction') + elements
-    elements += soup.find_all(class_="productList")
-    elements += soup.find_all(class_="productReference")
+    tech_elements = soup.find_all(class_="productList") + soup.find_all(class_="productReference")
+    elements += tech_elements
 
     # Extract href attributes
     assets = []
@@ -93,12 +93,12 @@ def fetch_asset_urls(response):
                 if "assets.bose.com" in asset.get('href'):
                     assets.append(asset.get('href').replace("//assets","https://assets"))
                     label = asset.find_previous(class_='bose-list__title')
-                    asset_label.append(label.text if label else None)
+                    asset_label.append(label.text if label and element not in elements else None)
                     asset_text.append(asset.text)
                 else:
                     other_assets.append(asset.get('href'))
                     label = asset.find_previous(class_='bose-list__title')
-                    other_asset_label.append(label.text if label else None)
+                    other_asset_label.append(label.text if label and element not in elements else None)
                     other_asset_text.append(asset.text)
 
     elements = soup.find_all(class_="productList")
