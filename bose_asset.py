@@ -21,7 +21,7 @@ def fetch_asset_urls(response):
     img_tags = main[0].find_all('img')
     bg_image = main[0].find_all(class_='bose-story-block__backgroundContainer') + main[0].find_all(class_='bose-pageHeader__backgroundContainer')
     img_tags = bg_image + img_tags
-    bg_image += main[0].find_all(class_='bose-ecommerceArea')[0].find_all('img')
+    bg_image += main[0].find_all(class_='bose-ecommerceArea')[0].find_all('img') if main[0].find_all(class_='bose-ecommerceArea') else []
     related_page_images = []
     related_page_images += soup.find_all(class_="productList")[0].find_all('img') if soup.find_all(class_="productList") else [] 
     related_page_images += soup.find_all(class_="productReference")[0].find_all('img') if soup.find_all(class_="productReference") else []
