@@ -21,26 +21,50 @@ def fetch_asset_urls(response):
     img_tags = main[0].find_all('img')
     bg_image = main[0].find_all(class_='bose-story-block__backgroundContainer') + main[0].find_all(class_='bose-pageHeader__backgroundContainer')
     img_tags = bg_image + img_tags
+    bg_image += main[0].find_all(class_='bose-ecommerceArea')[0].find_all('img')
+    related_page_images = []
+    related_page_images += soup.find_all(class_="productList")[0].find_all('img') if soup.find_all(class_="productList") else [] 
+    related_page_images += soup.find_all(class_="productReference")[0].find_all('img') if soup.find_all(class_="productReference") else []
 
     # Extract image URLs
     image_urls = []
+    image_position = []
     other_urls =[]
+    other_image_position = []
     related_pages = []
     for img in img_tags:
+        other = False
         if 'data-bgset' in img.attrs:
             if '160w' in img['data-bgset']:
                 image_urls.append(img['data-bgset'].split('160w')[0].replace("//assets","https://assets"))
             else:
                 image_urls.append(img['data-bgset'].split('320w')[0].replace("//assets","https://assets"))
-        if 'data-srcset' in img.attrs:
+        elif 'data-srcset' in img.attrs:
             image_urls.append(img['data-srcset'].split('320w')[0].replace("//assets","https://assets"))
-
         elif 'src' in img.attrs:
             if "assets.bose.com" in img['src']:
-
                image_urls.append(img['src'].replace("//assets","https://assets"))
             else:
                 other_urls.append(img['src'].replace("//static","https://static"))
+                other = True
+        else:
+            continue
+
+        if img in bg_image:
+            if other:
+                other_image_position.append('Cover image')
+            else:
+                image_position.append('Cover image')
+        elif img in related_page_images:
+            if other:
+                other_image_position.append('Related page image')
+            else:
+                image_position.append('Related page image')
+        else:
+            if other:
+                other_image_position.append('Body image')
+            else:
+                image_position.append('Body image')
 
     # Find all elements with the specified class
     # elements = soup.find_all(class_="productDocuments")
@@ -88,7 +112,8 @@ def fetch_asset_urls(response):
         related_pages.append(label)
 
     return  image_urls, assets, other_urls, other_assets, related_pages,\
-        related_labels, asset_label, other_asset_label,asset_text, other_asset_text
+        related_labels, asset_label, other_asset_label,asset_text, other_asset_text,\
+            image_position, other_image_position
 
 def scrape_data(page_url):
     response = requests.get(page_url)
@@ -96,21 +121,24 @@ def scrape_data(page_url):
     # Check if the request was successful
     if response.status_code == 200:
         img_urls, asset_urls, other_urls, other_assets, related_pages, related_labels,\
-            asset_label, other_asset_label, asset_text, other_asset_text = fetch_asset_urls(response)
+            asset_label, other_asset_label, asset_text, other_asset_text ,\
+                image_position, other_image_position= fetch_asset_urls(response)
 
         df_bose_images = pd.DataFrame({'Bynder Image URLs': img_urls})
+        df_image_position = pd.DataFrame({'Bynder Image Position': image_position})
         df_assets = pd.DataFrame({'Bynder Asset URLS': asset_urls})
         df_assets_text = pd.DataFrame({'Bynder Asset Text': asset_text})
         df_assets_label = pd.DataFrame({'Bynder Asset Title': asset_label})
         df_other_images = pd.DataFrame({'Other image URLS': other_urls})
+        df_other_image_position = pd.DataFrame({'Other Image Position': other_image_position})
         df_other_assets = pd.DataFrame({'Other asset URLS': other_assets})
         df_other_assets_text = pd.DataFrame({'Other Asset Text': other_asset_text})
         df_other_assets_label = pd.DataFrame({'Other Asset Title': other_asset_label})
         df_related_pages = pd.DataFrame({'Related pages': related_pages})
         related_labels = pd.DataFrame({'Related labels': related_labels})
 
-        df_combined = pd.concat([df_bose_images, df_assets, df_assets_text, df_assets_label, \
-            df_other_images, df_other_assets, df_other_assets_text, df_other_assets_label, \
+        df_combined = pd.concat([df_bose_images, df_image_position, df_assets, df_assets_text, df_assets_label, \
+            df_other_images, df_other_image_position, df_other_assets, df_other_assets_text, df_other_assets_label, \
                 df_related_pages, related_labels], axis=1)
 
         return df_combined
