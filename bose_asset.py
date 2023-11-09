@@ -51,6 +51,8 @@ def fetch_asset_urls(response):
     other_assets = []
     asset_label = []
     other_asset_label = []
+    asset_text = []
+    other_asset_text = []
     for element in elements:
         a_tags = element.find_all('a')
         for asset in a_tags:
@@ -59,10 +61,12 @@ def fetch_asset_urls(response):
                     assets.append(asset.get('href').replace("//assets","https://assets"))
                     label = asset.find_previous(class_='bose-list__title')
                     asset_label.append(label.text if label else None)
+                    asset_text.append(asset.text)
                 else:
                     other_assets.append(asset.get('href'))
                     label = asset.find_previous(class_='bose-list__title')
                     other_asset_label.append(label.text if label else None)
+                    other_asset_text.append(asset.text)
 
     elements = soup.find_all(class_="productList")
     elements += soup.find_all(class_="productReference")
@@ -82,25 +86,31 @@ def fetch_asset_urls(response):
         related_labels.append(related_labels_pages[label])
         related_pages.append(label)
 
-    return  image_urls, assets, other_urls, other_assets, related_pages, related_labels, asset_label, other_asset_label
+    return  image_urls, assets, other_urls, other_assets, related_pages,\
+        related_labels, asset_label, other_asset_label,asset_text, other_asset_text
 
 def scrape_data(page_url):
     response = requests.get(page_url)
 
     # Check if the request was successful
     if response.status_code == 200:
-        img_urls, asset_urls, other_urls, other_assets, related_pages, related_labels, asset_label, other_asset_label= fetch_asset_urls(response)
+        img_urls, asset_urls, other_urls, other_assets, related_pages, related_labels,\
+            asset_label, other_asset_label, asset_text, other_asset_text = fetch_asset_urls(response)
 
         df_bose_images = pd.DataFrame({'Bynder Image URLs': img_urls})
         df_assets = pd.DataFrame({'Bynder Asset URLS': asset_urls})
+        df_assets_text = pd.DataFrame({'Bynder Asset Text': asset_text})
         df_assets_label = pd.DataFrame({'Bynder Asset Title': asset_label})
         df_other_images = pd.DataFrame({'Other image URLS': other_urls})
         df_other_assets = pd.DataFrame({'Other asset URLS': other_assets})
+        df_other_assets_text = pd.DataFrame({'Other Asset Text': other_asset_text})
         df_other_assets_label = pd.DataFrame({'Other Asset Title': other_asset_label})
         df_related_pages = pd.DataFrame({'Related pages': related_pages})
         related_labels = pd.DataFrame({'Related labels': related_labels})
 
-        df_combined = pd.concat([df_bose_images, df_assets, df_assets_label, df_other_images, df_other_assets, df_other_assets_label, df_related_pages, related_labels], axis=1)
+        df_combined = pd.concat([df_bose_images, df_assets, df_assets_text, df_assets_label, \
+            df_other_images, df_other_assets, df_other_assets_text, df_other_assets_label, \
+                df_related_pages, related_labels], axis=1)
 
         return df_combined
 
