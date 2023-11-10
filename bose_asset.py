@@ -11,17 +11,16 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import time
+import json
 
 def fetch_asset_urls(response):
     # Parse the HTML content of the page
     soup = BeautifulSoup(response.text, 'html.parser')
-
     # Find all image tags (img) on the page
     main = soup.find_all('main')
     img_tags = main[0].find_all('img')
     bg_image = main[0].find_all(class_='bose-story-block__backgroundContainer') + main[0].find_all(class_='bose-pageHeader__backgroundContainer')
-    catlog_img = main[0].find_all(class_='productCatalogList')
-    img_tags = bg_image + img_tags + catlog_img
+    img_tags = bg_image + img_tags
     bg_image += main[0].find_all(class_='bose-ecommerceArea')[0].find_all('img') if main[0].find_all(class_='bose-ecommerceArea') else []
     related_page_images = []
     related_page_images += soup.find_all(class_="productList")[0].find_all('img') if soup.find_all(class_="productList") else [] 
@@ -72,14 +71,12 @@ def fetch_asset_urls(response):
                 other_image_position.append('Body image')
             else:
                 image_position.append('Body image')
-
+            
     # Find all elements with the specified class
     # elements = soup.find_all(class_="productDocuments")
     elements = soup.find_all('div', attrs={'lpos': "Downloads region area"})
     elements = soup.find_all('div', class_='proCallToAction') + elements
     tech_elements = soup.find_all(class_="productList") + soup.find_all(class_="productReference")
-    elements += tech_elements + soup.find_all(class_='productCatalogList')
-    
 
     # Extract href attributes
     assets = []
@@ -120,6 +117,24 @@ def fetch_asset_urls(response):
     for label in related_labels_pages:
         related_labels.append(related_labels_pages[label])
         related_pages.append(label)
+        
+    catlog = main[0].find_all(class_='search-organism-container')
+    if catlog and main[0].find_all(class_='productCatalogList'):
+        catlog_json = json.loads(catlog[0]['data-search-data'])
+        products = catlog_json.get('products')
+        if products:
+            for prod in products:
+                if prod.get('mainImage'):
+                    image_urls.append(prod['mainImage'])
+                    image_position.append('Catlog image')
+                if prod.get('proCTAUrl'):
+                    assets.append(prod['proCTAUrl'])
+                    asset_text.append('TECHNICAL INFO')
+                if prod.get('url'):
+                    related_pages.append(prod['url'])
+                    related_labels.append(prod['name'])
+                
+            
 
     return  image_urls, assets, other_urls, other_assets, related_pages,\
         related_labels, asset_label, other_asset_label,asset_text, other_asset_text,\
