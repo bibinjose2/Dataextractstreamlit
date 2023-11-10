@@ -20,7 +20,8 @@ def fetch_asset_urls(response):
     main = soup.find_all('main')
     img_tags = main[0].find_all('img')
     bg_image = main[0].find_all(class_='bose-story-block__backgroundContainer') + main[0].find_all(class_='bose-pageHeader__backgroundContainer')
-    img_tags = bg_image + img_tags
+    catlog_img = main[0].find_all(class_='productCatalogList')
+    img_tags = bg_image + img_tags + catlog_img
     bg_image += main[0].find_all(class_='bose-ecommerceArea')[0].find_all('img') if main[0].find_all(class_='bose-ecommerceArea') else []
     related_page_images = []
     related_page_images += soup.find_all(class_="productList")[0].find_all('img') if soup.find_all(class_="productList") else [] 
@@ -77,7 +78,8 @@ def fetch_asset_urls(response):
     elements = soup.find_all('div', attrs={'lpos': "Downloads region area"})
     elements = soup.find_all('div', class_='proCallToAction') + elements
     tech_elements = soup.find_all(class_="productList") + soup.find_all(class_="productReference")
-    elements += tech_elements
+    elements += tech_elements + soup.find_all(class_='productCatalogList')
+    
 
     # Extract href attributes
     assets = []
@@ -102,7 +104,7 @@ def fetch_asset_urls(response):
                     other_asset_text.append(asset.text)
 
     elements = soup.find_all(class_="productList")
-    elements += soup.find_all(class_="productReference")
+    elements += soup.find_all(class_="productReference") + soup.find_all(class_='productCatalogList')
 
     # Extract href attributes
     related_labels_pages = {}
