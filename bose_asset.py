@@ -106,8 +106,10 @@ def fetch_asset_urls(response):
         except:
             pass
         try:
-            if element in zip_download and 'DOWNLOAD' not in str(a_tags[0].text):
-                continue
+            if element in zip_download:
+                a_tags = [element]
+                if'DOWNLOAD' not in str(a_tags[0].text):
+                    continue
         except:
             pass
         for asset in a_tags:
