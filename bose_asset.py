@@ -80,6 +80,7 @@ def fetch_asset_urls(response):
     # Find all elements with the specified class
     # elements = soup.find_all(class_="productDocuments")
     download_button = soup.find_all('div', class_="buttonLink")
+    print(download_button)
     elements = soup.find_all('div', attrs={'lpos': "Downloads region area"}) + \
         soup.find_all('div', attrs={'lpos': "Download region area"}) + download_button
     elements = soup.find_all('div', class_='bose-cta--show') + elements
@@ -94,8 +95,11 @@ def fetch_asset_urls(response):
     other_asset_text = []
     for element in elements:
         a_tags = element.find_all('a')
-        if element in download_button and 'Download' not in a_tags[1].text:
-            continue
+        try:
+            if element in download_button and 'Download' not in str(a_tags[1].text):
+                continue
+        except:
+            pass
         for asset in a_tags:
             if asset.get('href'):
                 if "assets.bose.com" in asset.get('href'):
