@@ -41,7 +41,7 @@ def fetch_asset_urls(response):
                 image_urls.append(img['data-bgset'].split('320w')[0].split('1280w')[0].replace("//assets","https://assets"))
         elif 'data-srcset' in img.attrs:
             if '1280' in img['data-srcset'] and '1920' in img['data-srcset']:
-                image_urls.append(img['data-srcset'].split('1280w ,')[1].split('1920w')[0].replace("//assets","https://assets"))
+                image_urls.append(img['data-srcset'].split('1280w, ')[1].split('1920w')[0].replace("//assets","https://assets"))
             elif '160w' in img['data-srcset']:
                 image_urls.append(img['data-srcset'].split('160w')[0].replace("//assets","https://assets"))
             else:
