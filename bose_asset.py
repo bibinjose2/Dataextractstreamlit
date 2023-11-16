@@ -79,7 +79,7 @@ def fetch_asset_urls(response):
             
     # Find all elements with the specified class
     # elements = soup.find_all(class_="productDocuments")
-    elements = soup.find_all('div', attrs={'lpos': "Downloads region area"})
+    elements = soup.find_all('div', attrs={'lpos': "Downloads region area"}) + soup.find_all('div', attrs={'lpos': "Download region area"})
     elements = soup.find_all('div', class_='bose-cta--show') + elements
     tech_elements = soup.find_all(class_="productList") + soup.find_all(class_="productReference")
 
