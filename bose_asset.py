@@ -84,7 +84,7 @@ def fetch_asset_urls(response):
     # Find all elements with the specified class
     # elements = soup.find_all(class_="productDocuments")
     download_button = soup.find_all('div', class_="buttonLink")
-    zip_download = soup.find_all('div', class_="bose-richText__link")
+    zip_download = soup.find_all('a', class_="bose-richText__link")
     elements = soup.find_all('div', attrs={'lpos': "Downloads region area"}) + \
         soup.find_all('div', attrs={'lpos': "Download region area"}) + download_button + zip_download
     elements = soup.find_all('div', class_='bose-cta--show') + elements + soup.find_all('div', class_='linkButtonAttachment') +\
