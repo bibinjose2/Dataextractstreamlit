@@ -35,6 +35,8 @@ def fetch_asset_urls(response):
     for img in img_tags:
         other = False
         if 'data-bgset' in img.attrs:
+            if '1280w' in img['data-bgset'] and '1920w' in img['data-bgset']:
+                image_urls.append(img['data-bgset'].split('1280w, ')[1].split('1920w')[0].replace("//assets","https://assets"))
             if '160w' in img['data-bgset']:
                 image_urls.append(img['data-bgset'].split('160w')[0].replace("//assets","https://assets"))
             else:
