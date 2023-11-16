@@ -101,14 +101,14 @@ def fetch_asset_urls(response):
     for element in elements:
         a_tags = element.find_all('a')
         try:
-            if element in download_button and 'Download' not in str(a_tags[1].text):
+            if element in download_button and 'download' not in str(a_tags[1].text).lower():
                 continue
         except:
             pass
         try:
             if element in zip_download:
                 a_tags = [element]
-                if'DOWNLOAD' not in str(a_tags[0].text):
+                if 'download' not in str(a_tags[0].text).lower():
                     continue
         except:
             pass
