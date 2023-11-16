@@ -84,10 +84,11 @@ def fetch_asset_urls(response):
     # Find all elements with the specified class
     # elements = soup.find_all(class_="productDocuments")
     download_button = soup.find_all('div', class_="buttonLink")
-    print(download_button)
+    zip_download = soup.find_all('div', class_="bose-richText__link")
     elements = soup.find_all('div', attrs={'lpos': "Downloads region area"}) + \
-        soup.find_all('div', attrs={'lpos': "Download region area"}) + download_button
-    elements = soup.find_all('div', class_='bose-cta--show') + elements
+        soup.find_all('div', attrs={'lpos': "Download region area"}) + download_button + zip_download
+    elements = soup.find_all('div', class_='bose-cta--show') + elements + soup.find_all('div', class_='linkButtonAttachment') +\
+        soup.find_all('div', class_='-download')
     tech_elements = soup.find_all(class_="productList") + soup.find_all(class_="productReference")
 
     # Extract href attributes
@@ -101,6 +102,11 @@ def fetch_asset_urls(response):
         a_tags = element.find_all('a')
         try:
             if element in download_button and 'Download' not in str(a_tags[1].text):
+                continue
+        except:
+            pass
+        try:
+            if element in zip_download and 'Download' not in str(a_tags[0].text):
                 continue
         except:
             pass
