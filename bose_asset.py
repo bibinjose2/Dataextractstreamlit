@@ -140,8 +140,8 @@ def fetch_asset_urls(response):
             for prod in products:
                 if prod.get('mainImage'):
                     if len(prod.get('variants', []))==2 and len(prod.get('colors', []))==2:
-                        image_urls.append(prod['variants'][1]['images']['largeImageURL'] \
-                            if prod.get('variants')[1]['color']['code']=='black' else prod['variants'][0]['images']['largeImageURL'])
+                        image_urls.append(prod['variants'][1]['images']['smallImageURL'] \
+                            if prod.get('variants')[1]['color']['code']=='black' else prod['variants'][0]['images']['smallImageURL'])
                     else:
                         image_urls.append(prod['mainImage'])
                     image_position.append('Catlog image')
