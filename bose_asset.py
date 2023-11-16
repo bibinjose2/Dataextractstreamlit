@@ -108,7 +108,8 @@ def fetch_asset_urls(response):
                     asset_label.append(label.text if label and element not in tech_elements else None)
                     asset_text.append(asset.text)
                 else:
-                    other_assets.append(asset.get('href'))
+                    other_assets.append(asset.get('href').replace("/en_us","https://www.boseprofessional.com/en_us") \
+                        if str(asset.get('href'))[0]=='/' else asset.get('href'))
                     label = asset.find_previous(class_='bose-list__title')
                     other_asset_label.append(label.text if label and element not in tech_elements else None)
                     other_asset_text.append(asset.text)
