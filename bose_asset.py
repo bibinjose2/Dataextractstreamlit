@@ -20,7 +20,8 @@ def fetch_asset_urls(response):
     main = soup.find_all('main')
     img_tags = main[0].find_all('img')
     bg_image = main[0].find_all(class_='bose-story-block__backgroundContainer') + main[0].find_all(class_='bose-pageHeader__backgroundContainer')
-    img_tags = bg_image + img_tags
+    poster = main[0].find_all('video')
+    img_tags = bg_image + img_tags + poster
     bg_image += main[0].find_all(class_='bose-ecommerceArea')[0].find_all('img') if main[0].find_all(class_='bose-ecommerceArea') else []
     related_page_images = []
     related_page_images += soup.find_all(class_="productList")[0].find_all('img') if soup.find_all(class_="productList") else [] 
@@ -62,6 +63,15 @@ def fetch_asset_urls(response):
             else:
                 other_urls.append(img['src'].replace("//static","https://static"))
                 other = True
+        elif 'poster' in img.attrs:
+            if "assets.bose.com" in img['poster']:
+                if '160w' in img['poster']:
+                    image_urls.append(img['poster'].split('160w')[0].replace("//assets","https://assets"))
+                else:
+                    image_urls.append(img['poster'].split('320w')[0].split('1280w')[0].replace("//assets","https://assets"))
+            else:
+                other_urls.append(img['poster'].replace("//static","https://static"))
+                other = True
         else:
             continue
 
@@ -75,6 +85,11 @@ def fetch_asset_urls(response):
                 other_image_position.append('Related page image')
             else:
                 image_position.append('Related page image')
+        elif img in poster:
+            if other:
+                other_image_position.append('Video poster')
+            else:
+                image_position.append('Video poster')
         else:
             if other:
                 other_image_position.append('Body image')
